@@ -1,0 +1,1 @@
+include (../KeePassForBlackBerry.pro)
