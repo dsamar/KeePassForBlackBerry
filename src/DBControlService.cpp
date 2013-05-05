@@ -14,15 +14,17 @@
    limitations under the License.
 ***************************************************************************/
 #include <QTimer>
+#include <QChar>
 #include "DBControlService.h"
 #include <bb/cascades/QmlDocument>
 #include <bb/cascades/SceneCover>
 #include <bb/system/Clipboard>
+#include "XmlReader.h"
 
 using namespace bb::cascades;
 
 DBControlService::DBControlService(bb::cascades::Application *app)
-: QObject(app), mLockoutTimer(), mCurrentDatabase()
+: QObject(app), mCurrentDatabase()
 {
 	this->db = 0;
 	this->mIsLocked = false;
@@ -32,6 +34,10 @@ DBControlService::DBControlService(bb::cascades::Application *app)
     // set parent to created document to ensure it exists for the whole application lifetime
     QmlDocument *qml = QmlDocument::create("asset:///main.qml");
     qml->setContextProperty("dbs", this);
+
+    // Make an instance of the XML Reader class so it is available to QML pages
+	XmlReader *xml = new XmlReader();
+	qml->setContextProperty("XML", xml);
 
     // Register the two data model types
     qmlRegisterType<KPBBGroupHandle>("DatabaseLibrary", 1, 0, "KPBBGroupHandle");
@@ -88,8 +94,7 @@ void DBControlService::unlockTrial()
 	QString filePath("app/native/assets/testdb.kdb");
 	QString password("testdb");
 	bool readOnly = true;
-
-	return this->unlock(filePath, password, QString::null, readOnly);
+	this->unlock(filePath, password, QString::null, readOnly);
 }
 
 void DBControlService::unlock(
@@ -132,12 +137,7 @@ void DBControlService::unlock(
 
 	this->setLock(false);
 	this->setValue("Success");
-
-	// Initialize Timer settings.
-	QSettings settings;
 	this->mCurrentDatabase = filePath;
-	QString savedTimer = this->getValueFor("lockoutTimerSetting", "30");
-	this->mLockoutTimer = savedTimer.left(savedTimer.indexOf('.')).toInt();
 	return;
 }
 
@@ -191,15 +191,38 @@ void DBControlService::searchText(const QString& searchString)
 	}
 }
 
-QString DBControlService::getValueFor(const QString &objectName, const QString &defaultValue)
+QString DBControlService::getGlobalSettingFor(const QString &objectName, const QString &defaultValue)
 {
     QSettings settings;
-    QString keyName = objectName;
 
-    if ("lockoutTimerSetting" == objectName)
-    {
-    	keyName = this->mCurrentDatabase + keyName;
+    // If no value has been saved, return the default value.
+    if (settings.value(objectName).isNull()) {
+    	qDebug() << "GET SETTING: " << objectName << " - DEFAULT VALUE - " << defaultValue;
+        return defaultValue;
     }
+
+    // Otherwise, return the value stored in the settings object.
+    qDebug() << "GET SETTING: " << objectName << " - " << settings.value(objectName).toString();
+    return settings.value(objectName).toString();
+}
+
+void DBControlService::saveGlobalSettingFor(const QString &objectName, const QString &inputValue)
+{
+    // A new value is saved to the application settings object.
+    QSettings settings;
+    settings.setValue(objectName, QVariant(inputValue));
+    qDebug() << "SET SETTING: " << objectName << " - " << inputValue;
+}
+
+QString DBControlService::getDatabaseSettingFor(const QString &objectName, const QString &defaultValue)
+{
+	if (this->mCurrentDatabase.isNull() || this->mCurrentDatabase.isEmpty())
+	{
+		return defaultValue;
+	}
+
+    QSettings settings;
+    QString keyName = this->mCurrentDatabase + objectName;
 
     // If no value has been saved, return the default value.
     if (settings.value(keyName).isNull()) {
@@ -210,18 +233,16 @@ QString DBControlService::getValueFor(const QString &objectName, const QString &
     return settings.value(keyName).toString();
 }
 
-void DBControlService::saveValueFor(const QString &objectName, const QString &inputValue)
+void DBControlService::saveDatabaseSettingFor(const QString &objectName, const QString &inputValue)
 {
-    // A new value is saved to the application settings object.
-    QSettings settings;
-    QString keyName = objectName;
-
-	if ("lockoutTimerSetting" == objectName && !this->mCurrentDatabase.isNull() && !this->mCurrentDatabase.isEmpty())
+	if (this->mCurrentDatabase.isNull() || this->mCurrentDatabase.isEmpty())
 	{
-		keyName = this->mCurrentDatabase + keyName;
-		this->mLockoutTimer = inputValue.left(inputValue.indexOf('.')).toInt();
+		return;
 	}
 
+	// A new value is saved to the application settings object.
+	QSettings settings;
+	QString keyName = this->mCurrentDatabase + objectName;
     settings.setValue(keyName, QVariant(inputValue));
 }
 
@@ -267,13 +288,32 @@ void DBControlService::setLockTimer()
 	}
 }
 
+bool DBControlService::charcodeIsLetter(int u) {
+	QChar c(u);
+	return c.isLetterOrNumber() || c.isPunct();
+}
+
+QString DBControlService::charcodeToQString(int u) {
+	return QString(u);
+}
+
 void DBControlService::onThumbnail()
 {
+	// Get the current database setting.
+	int lockoutTimerSetting = this->getDatabaseSettingFor("lockoutTimerSetting", "0").toInt();
+
+	QVariantList attributes;
+	attributes.append("index");
+	attributes.append("value");
+	XmlReader xml;
+	QVariantList xmlContents = xml.LoadXML("lockoutTimerDropDown.xml", "lockoutTimerOption", attributes);
+	int lockoutTime = xmlContents[lockoutTimerSetting].toMap()["value"].toInt();
+
 	if (0 != mTimer)
 	{
 		if (!this->isLocked() && !mTimer->isActive())
 		{
-			int timer = this->mLockoutTimer*1000;
+			int timer = lockoutTime*1000;
 			mTimer->start(timer);
 		}
 	}

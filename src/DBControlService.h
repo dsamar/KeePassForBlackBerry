@@ -58,6 +58,8 @@ public:
 
 	Q_INVOKABLE void populateGroupDataModel();
 	Q_INVOKABLE void searchText(const QString& searchString);
+	Q_INVOKABLE bool charcodeIsLetter(int u);
+	Q_INVOKABLE QString charcodeToQString(int u);
 
 	/**
 	 * This Invokable function gets a value from the QSettings,
@@ -68,8 +70,8 @@ public:
 	 * @return If the objectName exists, the value of the QSettings object is returned.
 	 *         If the objectName doesn't exist, the default value is returned.
 	 */
-	Q_INVOKABLE
-	QString getValueFor(const QString &objectName, const QString &defaultValue);
+	Q_INVOKABLE QString getGlobalSettingFor(const QString &objectName, const QString &defaultValue);
+	Q_INVOKABLE QString getDatabaseSettingFor(const QString &objectName, const QString &defaultValue);
 
 	/**
 	 * This function sets a value in the QSettings database. This function should to be called
@@ -78,8 +80,8 @@ public:
 	 * @param objectName Index path to the item
 	 * @param inputValue new value to the QSettings database
 	 */
-	Q_INVOKABLE
-	void saveValueFor(const QString &objectName, const QString &inputValue);
+	Q_INVOKABLE void saveGlobalSettingFor(const QString &objectName, const QString &inputValue);
+	Q_INVOKABLE void saveDatabaseSettingFor(const QString &objectName, const QString &inputValue);
 
 	QString value();
 	bool isLocked();
@@ -96,7 +98,6 @@ signals:
 private:
 	NavigationPane* mAppPage;
 	QTimer* mTimer;
-	int mLockoutTimer;
 	QString mCurrentDatabase;
 	QString m_sValue;
 	bool mIsLocked;

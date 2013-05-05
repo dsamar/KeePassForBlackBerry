@@ -32,7 +32,7 @@ NavigationPane {
 		
 		settingsAction: SettingsActionItem {
 		    onTriggered: {
-                lockoutTimerSetting.text = dbs.getValueFor("lockoutTimerSetting", "30");
+                lockoutTimerSetting.setSelectedIndex(dbs.getDatabaseSettingFor("lockoutTimerSetting", "0"));
                 settingsSheet.open();
             }
 		}
@@ -58,7 +58,6 @@ NavigationPane {
                 groupDataModel.clear();
             }
             lockScreenSheet.open();
-            masterPassword.requestFocus();
         }
     }
     // A reference to to the Page for presenting the page is kept while showing it
@@ -66,12 +65,13 @@ NavigationPane {
     property variant passwordPage
 
     onPopTransitionEnded: {
-        // The only occurrence of a pop transition that ends is when the Page
-        // with the text in a bubble is pushed by back navigation, this Page
-        // is created each time the a new qoute is selected in the list so
-        // in order to avoid memory leaks it is destroyed here.
         if (passwordPage == page) {
             page.destroy();
+            
+            if(searchBox.visible) // if we had the search box up, resume focus to it.
+            {
+                searchTextField.requestFocus();
+            }
         }
     }
     Page {
@@ -86,9 +86,6 @@ NavigationPane {
             passwordPage = passwordPageDefinition.createObject();
             passwordPage.passwordData = selectedData;
             nav.push(passwordPage);
-
-            // passwordPage.deleteQuote.connect(quotesListPage.deleteSelectedQuote);
-            // passwordPage.updateQuote.connect(quotesListPage.updateSelectedQuote);
             passwordPage.back.connect(nav.pop);
         }
 
@@ -126,6 +123,7 @@ NavigationPane {
                 }
                 TextField {
                     id: searchTextField
+                    focusPolicy: FocusPolicy.KeyAndTouch
                     layoutProperties: StackLayoutProperties {
                         spaceQuota: 4.0
 
@@ -202,12 +200,12 @@ NavigationPane {
                 imageSource: "asset:///images/entry_icons/_40.png"
                 ActionBar.placement: ActionBarPlacement.OnBar
                 onTriggered: {
-                    if (true == searchBox.visible)
+                    if (searchBox.visible)
                     {
                         searchBox.visible = false;
-                        searchTextField.requestFocus();
                         dbs.populateGroupDataModel();
                         searchTextField.setText(undefined);
+                        listView.requestFocus();
                     } else {
                         searchBox.visible = true;
                         searchTextField.requestFocus();
@@ -232,110 +230,159 @@ NavigationPane {
                 source: "PasswordPage.qml"
             }
         ]
+        keyListeners: [
+            KeyListener {
+                onKeyPressed: {
+                    if (!searchBox.visible)
+                    {
+                        var char_pressed = event.key;
+                        console.log("KEY CODE --" + char_pressed);
+                        if (dbs.charcodeIsLetter(char_pressed) && 
+                        	undefined != char_pressed && 
+                        	233 != char_pressed &&
+                        	225 != char_pressed &&
+                        	32 != char_pressed) // Alt and Shift and Space keys should not trigger search.
+                        {
+                            // check if key is a letter or number
+                            searchBox.visible = true;
+                            searchTextField.requestFocus();
+                            searchTextField.setText(dbs.charcodeToQString(char_pressed));
+                        }
+                    }
+                    else {
+                        var char_pressed = event.key;
+                        if (8 == char_pressed) // Backspace hit when search is visible and empty closes search
+                        {
+                            if ("" == searchTextField.text || undefined == searchTextField.text) {
+                                searchBox.visible = false;
+                                dbs.populateGroupDataModel();
+                                searchTextField.setText(undefined);
+                                listView.requestFocus();
+                            }
+                        }
+                    }
+                }
+            }
+        ]
     } // end of Page
     attachedObjects: [
         ComponentDefinition {
             id: appCover
             source: "AppCover.qml"
         },
-        Sheet {
+        Sheet {            
             id: lockScreenSheet
+            onOpened: {
+                masterPassword.requestFocus();
+            }
             peekEnabled: false
             content: Page {
                 id: openDbPage
-                content: Container {
-                    layout: DockLayout {
-
-                    }
-                    Container {
-                        leftPadding: 40.0
-                        topPadding: 40.0
-                        rightPadding: 40.0
-                        layout: StackLayout {
-
-                        }
-                        verticalAlignment: VerticalAlignment.Center
-                        horizontalAlignment: HorizontalAlignment.Center
-                        Container {
+                titleBar: TitleBar {
+                    kind: TitleBarKind.FreeForm
+                    kindProperties: FreeFormTitleBarKindProperties {
+                        content: Container {
                             layout: StackLayout {
                                 orientation: LayoutOrientation.LeftToRight
 
                             }
                             verticalAlignment: VerticalAlignment.Center
-                            horizontalAlignment: HorizontalAlignment.Center
+                            horizontalAlignment: HorizontalAlignment.Left
                             bottomMargin: 40.0
                             topMargin: 40.0
                             leftMargin: 40.0
                             rightMargin: 40.0
                             ImageView {
-	                            imageSource: "asset:///images/icon.png"
-	                            verticalAlignment: VerticalAlignment.Center
-	                            horizontalAlignment: HorizontalAlignment.Left
-                            }                 
+                                imageSource: "asset:///images/icon.png"
+                                verticalAlignment: VerticalAlignment.Center
+                                horizontalAlignment: HorizontalAlignment.Left
+                                scaleX: 0.6
+                                scaleY: 0.7
+                            }
                             Label {
                                 text: qsTr("KeePass for BlackBerry")
                                 textStyle.fontSize: FontSize.Large
-                                textStyle.fontWeight: FontWeight.W300
+                                textStyle.fontWeight: FontWeight.W400
                                 verticalAlignment: VerticalAlignment.Center
-                                horizontalAlignment: HorizontalAlignment.Center
+                                horizontalAlignment: HorizontalAlignment.Left
 
                             }
                         }
-                        Container {
-                            layout: StackLayout {
-                                orientation: LayoutOrientation.LeftToRight
+                    }
+                }
+                content: Container {
+                    layout: DockLayout {
 
+                    }
+                    Container {
+                        leftPadding: 20.0
+                        topPadding: 20.0
+                        rightPadding: 20.0
+                        layout: StackLayout {
+
+                        }
+                        verticalAlignment: VerticalAlignment.Center
+                        horizontalAlignment: HorizontalAlignment.Center
+                        DropDown {
+                            id: kdbPath
+                            title: qsTr("Database")
+                            enabled: true
+                            Option {
+                                id: demoDatabaseOption
+                                imageSource: "asset:///images/entry_icons/_63.png"
+                                text: qsTr("Demo Database")
+                                value: qsTr("DEMO")
+                                onSelectedChanged: {
+                                    if (selected == true) {
+                                        // Demo database
+                                        kdbKeyPath.visible = false;
+                                        kdbKeyPath.enabled = false;
+                                        masterPassword.visible = false;
+                                        masterPassword.enabled = false;
+                                        masterPassword.setText(undefined);
+                                        dbs.saveGlobalSettingFor("kdbPath", "DEMO");
+                                    } else {
+                                        kdbKeyPath.visible = true;
+                                        kdbKeyPath.enabled = true;
+                                        masterPassword.visible = true;
+                                        masterPassword.enabled = true;
+                                    }
+                                }
                             }
-                            TextField { // DATABASE FILE PATH
-                                id: kdbPath
-                                verticalAlignment: VerticalAlignment.Center
-                                hintText: qsTr("Database Path")
-                                layoutProperties: StackLayoutProperties {
-                                    spaceQuota: 4.0
-                                }
-                                text: dbs.getValueFor("kdbPath", "")
-                                onTextChanged: {
-                                    dbs.saveValueFor("kdbPath", kdbPath.text)
-                                }
-                            }
-                            Button { // DATABASE FILE PICKER
-                                imageSource: "asset:///images/database.png"
-                                verticalAlignment: VerticalAlignment.Center
-                                onClicked: {
-                                    kdbFilePicker.open()
-                                }
-                                horizontalAlignment: HorizontalAlignment.Right
-                                layoutProperties: StackLayoutProperties {
-                                    spaceQuota: 1
+
+                            Option {
+                                imageSource: "asset:///images/folder_open.png"
+                                text: qsTr("Select a file...")
+                                onSelectedChanged: {
+                                    if (selected == true) {
+                                        kdbFilePicker.open()
+                                    }
                                 }
                             }
                         }
-                        Container {
-                            layout: StackLayout {
-                                orientation: LayoutOrientation.LeftToRight
-
+                        DropDown {
+                            id: kdbKeyPath
+                            title: qsTr("Key File")
+                            enabled: true
+                            Option {
+                                id: noKeyOption
+                                text: qsTr("None");
+                                value: "default"
+                                imageSource: "asset:///images/entry_icons/_45.png"
+                                onSelectedChanged: {
+                                    if (selected == true)
+                                    {
+                                        dbs.saveGlobalSettingFor("kdbKeyPath", noKeyOption.value);
+                                    }
+                                }
                             }
-                            TextField { // KEY FILE PATH
-                                id: kdbKeyPath
-                                verticalAlignment: VerticalAlignment.Center
-                                hintText: qsTr("Key File Path")
-                                layoutProperties: StackLayoutProperties {
-                                    spaceQuota: 4.0
-                                }
-                                text: dbs.getValueFor("kdbKeyPath", "")
-                                onTextChanged: {
-                                    dbs.saveValueFor("kdbKeyPath", kdbKeyPath.text)
-                                }
-                            }
-                            Button { // KEY FILE PICKER
-                                imageSource: "asset:///images/key.png"
-                                verticalAlignment: VerticalAlignment.Center
-                                onClicked: {
-                                    kdbKeyFilePicker.open()
-                                }
-                                horizontalAlignment: HorizontalAlignment.Right
-                                layoutProperties: StackLayoutProperties {
-                                    spaceQuota: 1
+                            Option {
+                                imageSource: "asset:///images/folder_open.png"
+                                text: qsTr("Select a file...")
+                                onSelectedChanged: {
+                                    if (selected == true) {
+                                        kdbKeyFilePicker.open()
+                                    }
                                 }
                             }
                         }
@@ -345,11 +392,18 @@ NavigationPane {
                             textFormat: TextFormat.Plain
                             inputMode: TextFieldInputMode.Password
                             hintText: qsTr("Password")
+                            shortcuts: Shortcut {
+                                key: qsTr("Enter")
+                                onTriggered: {
+                                    kdbOpenButton.clicked();
+                                }
+                            }
                         }
                         Button { // OPEN DATABASE BUTTON
                             id: kdbOpenButton
+                            focusPolicy: FocusPolicy.KeyAndTouch
                             shortcuts: Shortcut {
-                                key: "Return"
+                                key: qsTr("Enter")
                                 onTriggered: {
                                     kdbOpenButton.clicked();
                                 }
@@ -360,51 +414,27 @@ NavigationPane {
                                 kdbProgressDialog.confirmButton.label = "Cancel";
                                 kdbProgressDialog.show();
                                 dbs.valueChanged.connect(kdbOpenButton.onDbsUnlock)
-                                dbs.unlock(kdbPath.text, masterPassword.text, kdbKeyPath.text, true)
-                            }
-                            function onDbsUnlock(val) {
-                                if ("Success" == val) {
-                                    kdbProgressDialog.cancel();
-                                    lockScreenSheet.close();
-                                    dbs.populateGroupDataModel();
-                                    masterPassword.setText(undefined);
-                                } else {
-                                    kdbErrorDialog.body = val;
-                                    kdbErrorDialog.cancelButton.label = undefined;
-                                    kdbErrorDialog.show();
-                                    kdbProgressDialog.cancel();
-                                }
-                            }
-                            horizontalAlignment: HorizontalAlignment.Center
-                            visible: true
-                        }
-                        Button { // TRIAL DATABASE BUTTON
-                            id: kdbTrialOpenButton
-                            verticalAlignment: VerticalAlignment.Bottom
-                            text: qsTr("Demo Database")
-                            visible: true
-                            onClicked: {
-                                kdbProgressDialog.confirmButton.label = "Cancel";
-                                kdbProgressDialog.show();
-                                dbs.valueChanged.connect(kdbOpenButton.onDbsUnlock)
-                                dbs.unlockTrial();
-                            }
-                            horizontalAlignment: HorizontalAlignment.Center
-                            function onDbsUnlock(val) {
-                                if ("Success" == val) {
-                                    kdbProgressDialog.cancel();
-                                    lockScreenSheet.close();
-                                    dbs.populateGroupDataModel();
-                                    masterPassword.setText(undefined);
-                                } else {
-                                    kdbErrorDialog.body = val;
-                                    kdbErrorDialog.cancelButton.label = undefined;
-                                    kdbErrorDialog.show();
-                                    kdbProgressDialog.cancel();
-                                }
-                            }
-                        }
 
+                                // Check if demo database is selected.
+                                if (kdbPath.selectedValue == qsTr("DEMO")) {
+                                    dbs.unlockTrial();
+                                } else {
+                                    dbs.unlock(kdbPath.selectedValue, masterPassword.text, kdbKeyPath.selectedValue, true)
+                                }
+                            }
+                            function onDbsUnlock(val) {
+                                if ("Success" == val) {
+                                    unlockDatabase();
+                                } else {
+                                    kdbErrorDialog.body = val;
+                                    kdbErrorDialog.cancelButton.label = undefined;
+                                    kdbErrorDialog.show();
+                                    kdbProgressDialog.cancel();
+                                }
+                            }
+                            horizontalAlignment: HorizontalAlignment.Center
+                            visible: true
+                        }
                     } // end of Container
                 }                
                 attachedObjects: [
@@ -413,10 +443,19 @@ NavigationPane {
                         type: FileType.Other
                         title: qsTr("Select KeePass database file.")
                         directories: [ "/accounts/1000/shared/" ]
+                        onCanceled: {
+                            kdbPath.setSelectedIndex(-1);
+                        }
                         onFileSelected: {
-                            console.log("FileSelected signal received : " + selectedFiles);
                             var nice_path = selectedFiles[0].slice(15, selectedFiles[0].length);
-                            kdbPath.setText(nice_path);
+                            var newOption = selectedDatabaseOptionComponent.createObject();
+                            kdbPath.add(newOption);
+                            newOption.setText(nice_path);
+                            newOption.setValue(nice_path);
+                            kdbPath.setSelectedOption(newOption);
+
+                            // Save in global settings.
+                            dbs.saveGlobalSettingFor("kdbPath", nice_path);
                         }
                     },
                     FilePicker {
@@ -424,10 +463,19 @@ NavigationPane {
                         type: FileType.Other
                         title: qsTr("Select a key file.")
                         directories: [ "/accounts/1000/shared/" ]
+                        onCanceled: {
+                            kdbKeyPath.setSelectedOption(noKeyOption);
+                        }
                         onFileSelected: {
-                            console.log("FileSelected signal received : " + selectedFiles);
                             var nice_path = selectedFiles[0].slice(15, selectedFiles[0].length);
-                            kdbKeyPath.setText(nice_path);
+                            var newOption = selectedKeyFileOptionComponent.createObject();
+                            kdbKeyPath.add(newOption);
+                            newOption.setText(nice_path);
+                            newOption.setValue(nice_path);
+                            kdbKeyPath.setSelectedOption(newOption)
+                            
+                            // Save in global settings.
+                            dbs.saveGlobalSettingFor("kdbKeyPath", nice_path);
                         }
                     },
                     SystemProgressDialog {
@@ -437,6 +485,30 @@ NavigationPane {
                     SystemDialog {
                         id: kdbErrorDialog
                         title: "Error"
+                    },
+                    ComponentDefinition {
+                        id: selectedDatabaseOptionComponent
+                        content: Option {
+                            id: selectedDatabaseOption
+                            onSelectedChanged: {
+                                if (selected == true) {
+                                    dbs.saveGlobalSettingFor("kdbPath", selectedDatabaseOption.value);
+                                }
+                            }
+                            imageSource: "asset:///images/database.png"
+                        }
+                    },
+                    ComponentDefinition {
+                        id: selectedKeyFileOptionComponent
+                        content: Option {
+                            id: selectedKeyFileOption
+                            onSelectedChanged: {
+                                if (selected == true) {
+                                    dbs.saveGlobalSettingFor("kdbKeyPath", selectedKeyFileOption.value);
+                                }
+                            }
+                            imageSource: "asset:///images/key.png"
+                        }
                     }
                 ] // end of attachedObjects list
             } // End of Page
@@ -465,8 +537,11 @@ NavigationPane {
                             Button {
                         	    text: qsTr("Done")
                         	    onClicked: {
-                                    dbs.saveValueFor("lockoutTimerSetting", lockoutTimerSetting.text)
                                     settingsSheet.close(); 
+                                    if (searchBox.visible)
+                                    {
+                                        searchTextField.requestFocus();
+                                    }
                                 }
                                 horizontalAlignment: HorizontalAlignment.Right
                                 verticalAlignment: VerticalAlignment.Center
@@ -479,27 +554,98 @@ NavigationPane {
                     layout: StackLayout {
 
                     }
-                    // Timeout Period
-                    Label {
-                        text: qsTr("Lockout Timer (Seconds):")
-                        verticalAlignment: VerticalAlignment.Center
-                    }
-                    TextField {
+                    DropDown {
                         id: lockoutTimerSetting
-                        text: dbs.getValueFor("lockoutTimerSetting", "30")
-                        horizontalAlignment: HorizontalAlignment.Left
-                        verticalAlignment: VerticalAlignment.Center
-                        inputMode: TextFieldInputMode.NumbersAndPunctuation
+                        selectedIndex: dbs.getDatabaseSettingFor("lockoutTimerSetting", "0")
+                        title: qsTr("Lockout Timer")
+                        onSelectedValueChanged: {
+                            dbs.saveDatabaseSettingFor("lockoutTimerSetting", lockoutTimerSetting.selectedIndex)
+                        }
                     }
                 }
+                //
+                // Per bug BBTEN-302: I need to specify a new ComponentDefinition in the attachedObjects section
+                //                    In order to add options to a DropDown
+                //                    http://boredwookie.net/index.php/blog/blackberry-10-cascades-create-a-custom-control-dropdownlist/
+                //
+                attachedObjects: [
+                    ComponentDefinition {
+                        id: option
+                        Option {
+                        }
+                    }
+                ]
                 
+                onCreationCompleted: {
+                    initializeSettings();
+                    restoreLockScreenSelections();
+                }
             }
         }
     ]
     
+    function restoreLockScreenSelections()
+    {
+        var dbPath = dbs.getGlobalSettingFor("kdbPath", "default");
+        if (dbPath == "DEMO") {
+            kdbPath.setSelectedOption(demoDatabaseOption);
+            return;
+        }
+
+        if (dbPath != "default")
+        {
+            var dbOption = selectedDatabaseOptionComponent.createObject();
+            kdbPath.add(dbOption);
+            dbOption.setText(dbPath);
+            dbOption.setValue(dbPath);
+            kdbPath.setSelectedOption(dbOption);
+        }
+        
+        var keyPath = dbs.getGlobalSettingFor("kdbKeyPath", "default");
+        if (keyPath != "default")
+        {
+            var keyOption = selectedKeyFileOptionComponent.createObject();
+            kdbKeyPath.add(keyOption);
+            keyOption.setText(keyPath);
+            keyOption.setValue(keyPath);
+            kdbKeyPath.setSelectedOption(keyOption)
+        } else {
+            kdbKeyPath.setSelectedOption(noKeyOption);
+        }
+    }
+    
+    function unlockDatabase()
+    {
+        kdbProgressDialog.cancel();
+        lockScreenSheet.close();
+        dbs.populateGroupDataModel();
+        masterPassword.setText(undefined);
+        loadDatabaseSettings();
+    }
     
     function lockDatabase()
     {
-    	dbs.setLock(true);
+        searchBox.visible = false;
+        searchTextField.setText(undefined);
+        dbs.setLock(true);
+    }
+    
+    function initializeSettings() {
+        var xmlContents = XML.LoadXML("lockoutTimerDropDown.xml", "lockoutTimerOption", ["text", "value"]); // Call the C++ Method to load the XML data. 3 arguments: XML File, Row name, attribute name
+
+        // Clear the contents of the DropDown
+        lockoutTimerSetting.removeAll();
+
+        // Add the options from the XML to the DropDown
+        for (var x = 0; x < xmlContents.length; x ++) {
+            var opt = option.createObject(); //
+            opt.text = xmlContents[x].text; // Needs to be an 'Option' before the DropDown will accept it
+
+            lockoutTimerSetting.add(opt);
+        }
+    }
+    
+    function loadDatabaseSettings() {
+        lockoutTimerSetting.setSelectedIndex(dbs.getDatabaseSettingFor("lockoutTimerSetting", "0"))
     }
 } // end of navigation

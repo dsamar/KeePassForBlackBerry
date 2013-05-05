@@ -1,5 +1,5 @@
 1
-81
+82
 720x720/images/cover.png
 768x1280/images/cover.png
 AppCover.qml
@@ -81,3 +81,4 @@ images/username_copy.png
 main.qml
 PasswordPage.qml
 testdb.kdb
+XML/lockoutTimerDropDown.xml

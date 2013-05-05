@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+	<lockoutTimerOption index="0" text="30 seconds" value="30" />
+	<lockoutTimerOption index="1" text="1 minute" value="60" />
+	<lockoutTimerOption index="2" text="5 minutes" value="300" />
+	<lockoutTimerOption index="3" text="10 minutes" value="600" />
+	<lockoutTimerOption index="4" text="30 minutes" value="1800" />
+</root>
