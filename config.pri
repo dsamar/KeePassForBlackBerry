@@ -19,6 +19,7 @@ device {
                  $$quote($$BASEDIR/src/crypto/twofish.cpp) \
                  $$quote($$BASEDIR/src/crypto/yarrow.cpp) \
                  $$quote($$BASEDIR/src/lib/SecString.cpp) \
+                 $$quote($$BASEDIR/src/lib/XmlReader.cpp) \
                  $$quote($$BASEDIR/src/lib/random.cpp) \
                  $$quote($$BASEDIR/src/lib/tools.cpp) \
                  $$quote($$BASEDIR/src/main.cpp)
@@ -44,6 +45,7 @@ device {
                  $$quote($$BASEDIR/src/keepassx.h) \
                  $$quote($$BASEDIR/src/lib/AutoType.h) \
                  $$quote($$BASEDIR/src/lib/SecString.h) \
+                 $$quote($$BASEDIR/src/lib/XmlReader.h) \
                  $$quote($$BASEDIR/src/lib/random.h) \
                  $$quote($$BASEDIR/src/lib/tools.h)
     }
@@ -65,6 +67,7 @@ device {
                  $$quote($$BASEDIR/src/crypto/twofish.cpp) \
                  $$quote($$BASEDIR/src/crypto/yarrow.cpp) \
                  $$quote($$BASEDIR/src/lib/SecString.cpp) \
+                 $$quote($$BASEDIR/src/lib/XmlReader.cpp) \
                  $$quote($$BASEDIR/src/lib/random.cpp) \
                  $$quote($$BASEDIR/src/lib/tools.cpp) \
                  $$quote($$BASEDIR/src/main.cpp)
@@ -90,6 +93,7 @@ device {
                  $$quote($$BASEDIR/src/keepassx.h) \
                  $$quote($$BASEDIR/src/lib/AutoType.h) \
                  $$quote($$BASEDIR/src/lib/SecString.h) \
+                 $$quote($$BASEDIR/src/lib/XmlReader.h) \
                  $$quote($$BASEDIR/src/lib/random.h) \
                  $$quote($$BASEDIR/src/lib/tools.h)
     }
@@ -113,6 +117,7 @@ simulator {
                  $$quote($$BASEDIR/src/crypto/twofish.cpp) \
                  $$quote($$BASEDIR/src/crypto/yarrow.cpp) \
                  $$quote($$BASEDIR/src/lib/SecString.cpp) \
+                 $$quote($$BASEDIR/src/lib/XmlReader.cpp) \
                  $$quote($$BASEDIR/src/lib/random.cpp) \
                  $$quote($$BASEDIR/src/lib/tools.cpp) \
                  $$quote($$BASEDIR/src/main.cpp)
@@ -138,6 +143,7 @@ simulator {
                  $$quote($$BASEDIR/src/keepassx.h) \
                  $$quote($$BASEDIR/src/lib/AutoType.h) \
                  $$quote($$BASEDIR/src/lib/SecString.h) \
+                 $$quote($$BASEDIR/src/lib/XmlReader.h) \
                  $$quote($$BASEDIR/src/lib/random.h) \
                  $$quote($$BASEDIR/src/lib/tools.h)
     }
