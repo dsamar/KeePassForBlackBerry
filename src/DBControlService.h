@@ -31,6 +31,7 @@
 #include <bb/cascades/CustomControl>
 #include <bb/cascades/Page>
 #include <bb/cascades/NavigationPane>
+#include <bb/platform/HomeScreen>
 
 using namespace bb::cascades;
 
@@ -46,7 +47,7 @@ class DBControlService : public QObject
 
 
 public:
-    DBControlService(bb::cascades::Application *app);
+    DBControlService(bb::cascades::Application *app, bb::platform::HomeScreen *homeScreen);
 	virtual ~DBControlService();
 
 	Q_INVOKABLE void unlockTrial();
@@ -89,8 +90,10 @@ public:
 	Q_SLOT void setLock(bool b);
 	Q_SLOT void setLockTimer();
 	Q_SLOT void cancelLockTimer();
-	Q_SLOT void onThumbnail();
-
+	Q_SLOT void startLockoutTimer();
+	Q_SLOT void onLockStateChanged(bb::platform::DeviceLockState::Type newState);
+	Q_SLOT void onMinimize();
+	Q_SLOT void onFullScreen();
 signals:
 	void valueChanged(QString);
 	void lockChanged(bool);
@@ -101,6 +104,7 @@ private:
 	QString mCurrentDatabase;
 	QString m_sValue;
 	bool mIsLocked;
+	bool mIsFullScreen;
     IDatabase* db;
     IGroupHandle* mCurrentGroup;
 };

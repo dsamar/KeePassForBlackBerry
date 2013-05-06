@@ -15,6 +15,7 @@
 ***************************************************************************/
 #include <QTimer>
 #include <QChar>
+#include <QObject>
 #include "DBControlService.h"
 #include <bb/cascades/QmlDocument>
 #include <bb/cascades/SceneCover>
@@ -23,8 +24,8 @@
 
 using namespace bb::cascades;
 
-DBControlService::DBControlService(bb::cascades::Application *app)
-: QObject(app), mCurrentDatabase()
+DBControlService::DBControlService(bb::cascades::Application *app, bb::platform::HomeScreen *homeScreen)
+: QObject(app), mCurrentDatabase(), mIsFullScreen(true)
 {
 	this->db = 0;
 	this->mIsLocked = false;
@@ -56,11 +57,16 @@ DBControlService::DBControlService(bb::cascades::Application *app)
     NavigationPane *root = qml->createRootObject<NavigationPane>();
     this->mAppPage = root;
 
-    QObject::connect(app, SIGNAL(thumbnail()), this, SLOT( onThumbnail() ));
+    // connect to thumbnail signal (for locking purposes)
+    QObject::connect(app, SIGNAL(thumbnail()), this, SLOT( onMinimize() ));
+
+    // connect to homescreen lock event (for locking purposes)
+    QObject::connect(homeScreen, SIGNAL( lockStateChanged(bb::platform::DeviceLockState::Type) ),
+                     this, SLOT( onLockStateChanged(bb::platform::DeviceLockState::Type) ));
 
     mTimer = new QTimer(this);
-    QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(setLockTimer()));
-    QObject::connect(app, SIGNAL(fullscreen()), this, SLOT(cancelLockTimer()));
+    QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT( setLockTimer() ));
+    QObject::connect(app, SIGNAL(fullscreen()), this, SLOT( onFullScreen() ));
 
     // set created root object as a scene
     app->setScene(root);
@@ -297,7 +303,7 @@ QString DBControlService::charcodeToQString(int u) {
 	return QString(u);
 }
 
-void DBControlService::onThumbnail()
+void DBControlService::startLockoutTimer()
 {
 	// Get the current database setting.
 	int lockoutTimerSetting = this->getDatabaseSettingFor("lockoutTimerSetting", "0").toInt();
@@ -320,16 +326,41 @@ void DBControlService::onThumbnail()
 	{
 		if (!this->isLocked() && !mTimer->isActive())
 		{
+			qDebug() << "LOCKOUT TIMER STARTED";
 			int timer = lockoutTime*1000;
 			mTimer->start(timer);
 		}
 	}
 }
 
+void DBControlService::onLockStateChanged(bb::platform::DeviceLockState::Type newState)
+{
+    if (newState == bb::platform::DeviceLockState::Unlocked) {
+        this->cancelLockTimer();
+    } else if (newState == bb::platform::DeviceLockState::ScreenLocked ||
+    		newState == bb::platform::DeviceLockState::PasswordLocked ||
+    		newState == bb::platform::DeviceLockState::PinBlocked) {
+    	this->startLockoutTimer();
+    }
+}
+
 void DBControlService::cancelLockTimer()
 {
-	if (0 != mTimer)
+	if (0 != mTimer && this->mIsFullScreen)
 	{
+		qDebug() << "LOCKOUT TIMER STOPPED";
 		mTimer->stop();
 	}
+}
+
+void DBControlService::onMinimize()
+{
+	this->mIsFullScreen = false;
+	this->startLockoutTimer();
+}
+
+void DBControlService::onFullScreen()
+{
+	this->mIsFullScreen = true;
+	this->cancelLockTimer();
 }

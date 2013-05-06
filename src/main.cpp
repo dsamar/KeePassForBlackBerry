@@ -15,6 +15,7 @@
 ***************************************************************************/
 
 #include <bb/cascades/Application>
+#include <bb/platform/HomeScreen>
 #include <QLocale>
 #include <QTranslator>
 #include <QObject>
@@ -33,6 +34,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
 {
     // this is where the server is started etc
     Application app(argc, argv);
+    bb::platform::HomeScreen homeScreen;
 
 	// Initialization Stuff
     initYarrow();
@@ -67,7 +69,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
 //    }
 
     // create the application pane object to init UI etc.
-    new DBControlService(&app);
+    new DBControlService(&app, &homeScreen);
 
     // we complete the transaction started in the app constructor and start the client event loop here
     return Application::exec();
