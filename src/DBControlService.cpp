@@ -307,6 +307,13 @@ void DBControlService::onThumbnail()
 	attributes.append("value");
 	XmlReader xml;
 	QVariantList xmlContents = xml.LoadXML("lockoutTimerDropDown.xml", "lockoutTimerOption", attributes);
+
+	// Make sure it's bounded.
+	if (lockoutTimerSetting >= xmlContents.length() || lockoutTimerSetting < 0)
+	{
+		lockoutTimerSetting = 0;
+	}
+
 	int lockoutTime = xmlContents[lockoutTimerSetting].toMap()["value"].toInt();
 
 	if (0 != mTimer)

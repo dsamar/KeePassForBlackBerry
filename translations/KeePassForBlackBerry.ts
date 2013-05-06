@@ -166,13 +166,13 @@ The key is wrong or the file is damaged.</source>
 <context>
     <name>main</name>
     <message>
-        <location filename="../assets/main.qml" line="134"/>
-        <location filename="../assets/main.qml" line="202"/>
+        <location filename="../assets/main.qml" line="131"/>
+        <location filename="../assets/main.qml" line="199"/>
         <source>Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="141"/>
+        <location filename="../assets/main.qml" line="138"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -182,80 +182,80 @@ The key is wrong or the file is damaged.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="306"/>
+        <location filename="../assets/main.qml" line="303"/>
         <source>KeePass for BlackBerry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="336"/>
+        <location filename="../assets/main.qml" line="333"/>
         <source>Demo Database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="337"/>
-        <location filename="../assets/main.qml" line="422"/>
+        <location filename="../assets/main.qml" line="334"/>
+        <location filename="../assets/main.qml" line="419"/>
         <source>DEMO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="372"/>
+        <location filename="../assets/main.qml" line="369"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="397"/>
+        <location filename="../assets/main.qml" line="394"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="399"/>
-        <location filename="../assets/main.qml" line="409"/>
+        <location filename="../assets/main.qml" line="396"/>
+        <location filename="../assets/main.qml" line="406"/>
         <source>Enter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="415"/>
+        <location filename="../assets/main.qml" line="412"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="447"/>
+        <location filename="../assets/main.qml" line="444"/>
         <source>Select KeePass database file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="467"/>
+        <location filename="../assets/main.qml" line="464"/>
         <source>Select a key file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="331"/>
+        <location filename="../assets/main.qml" line="328"/>
         <source>Database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="358"/>
-        <location filename="../assets/main.qml" line="384"/>
+        <location filename="../assets/main.qml" line="355"/>
+        <location filename="../assets/main.qml" line="381"/>
         <source>Select a file...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="368"/>
+        <location filename="../assets/main.qml" line="365"/>
         <source>Key File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="534"/>
+        <location filename="../assets/main.qml" line="531"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="541"/>
+        <location filename="../assets/main.qml" line="538"/>
         <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="563"/>
+        <location filename="../assets/main.qml" line="560"/>
         <source>Lockout Timer</source>
         <translation type="unfinished"></translation>
     </message>

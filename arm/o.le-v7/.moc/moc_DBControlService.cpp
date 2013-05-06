@@ -22,8 +22,8 @@ static const uint qt_meta_data_DBControlService[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      12,   14, // methods
-       2,   74, // properties
+      16,   14, // methods
+       2,   94, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
@@ -44,12 +44,16 @@ static const uint qt_meta_data_DBControlService[] = {
      170,  135,   17,   17, 0x02,
      207,   17,   17,   17, 0x02,
      245,  232,   17,   17, 0x02,
-     297,  273,  265,   17, 0x02,
-     348,  326,   17,   17, 0x02,
+     272,  270,  265,   17, 0x02,
+     302,  270,  294,   17, 0x02,
+     349,  325,  294,   17, 0x02,
+     386,  325,  294,   17, 0x02,
+     447,  425,   17,   17, 0x02,
+     485,  425,   17,   17, 0x02,
 
  // properties: name, type, flags
-     378,  265, 0x0a495103,
-     389,  384, 0x01495003,
+     525,  294, 0x0a495103,
+     531,  265, 0x01495003,
 
  // properties: notify_signal_id
        0,
@@ -66,12 +70,15 @@ static const char qt_meta_stringdata_DBControlService[] = {
     "filePath,password,keyFile,readOnly\0"
     "unlock(QString,QString,QString,bool)\0"
     "populateGroupDataModel()\0searchString\0"
-    "searchText(QString)\0QString\0"
-    "objectName,defaultValue\0"
-    "getValueFor(QString,QString)\0"
+    "searchText(QString)\0bool\0u\0"
+    "charcodeIsLetter(int)\0QString\0"
+    "charcodeToQString(int)\0objectName,defaultValue\0"
+    "getGlobalSettingFor(QString,QString)\0"
+    "getDatabaseSettingFor(QString,QString)\0"
     "objectName,inputValue\0"
-    "saveValueFor(QString,QString)\0value\0"
-    "bool\0isLocked\0"
+    "saveGlobalSettingFor(QString,QString)\0"
+    "saveDatabaseSettingFor(QString,QString)\0"
+    "value\0isLocked\0"
 };
 
 void DBControlService::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -90,9 +97,16 @@ void DBControlService::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
         case 7: _t->unlock((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])),(*reinterpret_cast< bool(*)>(_a[4]))); break;
         case 8: _t->populateGroupDataModel(); break;
         case 9: _t->searchText((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 10: { QString _r = _t->getValueFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+        case 10: { bool _r = _t->charcodeIsLetter((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
+        case 11: { QString _r = _t->charcodeToQString((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = _r; }  break;
-        case 11: _t->saveValueFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
+        case 12: { QString _r = _t->getGlobalSettingFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = _r; }  break;
+        case 13: { QString _r = _t->getDatabaseSettingFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = _r; }  break;
+        case 14: _t->saveGlobalSettingFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
+        case 15: _t->saveDatabaseSettingFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
         default: ;
         }
     }
@@ -130,9 +144,9 @@ int DBControlService::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 12)
+        if (_id < 16)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 12;
+        _id -= 16;
     }
 #ifndef QT_NO_PROPERTIES
       else if (_c == QMetaObject::ReadProperty) {
