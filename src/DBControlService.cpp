@@ -109,6 +109,11 @@ void DBControlService::unlock(
 		QString keyfile,
 		bool readOnly)
 {
+	filePath = QDir::currentPath() + "/../../" + filePath;
+	if (!keyfile.isNull() && !keyfile.isEmpty()) {
+		keyfile = QDir::currentPath() + "/../../" + keyfile;
+	}
+
 	if (!this->mIsLocked)
 	{
 		this->setValue("Invalid Operation. Database already open.");
@@ -326,7 +331,6 @@ void DBControlService::startLockoutTimer()
 	{
 		if (!this->isLocked() && !mTimer->isActive())
 		{
-			qDebug() << "LOCKOUT TIMER STARTED";
 			int timer = lockoutTime*1000;
 			mTimer->start(timer);
 		}
@@ -348,7 +352,6 @@ void DBControlService::cancelLockTimer()
 {
 	if (0 != mTimer && this->mIsFullScreen)
 	{
-		qDebug() << "LOCKOUT TIMER STOPPED";
 		mTimer->stop();
 	}
 }
