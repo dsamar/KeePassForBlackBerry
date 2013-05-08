@@ -109,7 +109,11 @@ void DBControlService::unlock(
 		QString keyfile,
 		bool readOnly)
 {
-	filePath = QDir::currentPath() + "/../../" + filePath;
+	if (filePath != QString("app/native/assets/testdb.kdb"))
+	{
+		filePath = QDir::currentPath() + "/../../" + filePath;
+	}
+
 	if (!keyfile.isNull() && !keyfile.isEmpty()) {
 		keyfile = QDir::currentPath() + "/../../" + keyfile;
 	}
