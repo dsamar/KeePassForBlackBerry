@@ -230,40 +230,6 @@ NavigationPane {
                 source: "PasswordPage.qml"
             }
         ]
-        keyListeners: [
-            KeyListener {
-                onKeyPressed: {
-                    if (!searchBox.visible)
-                    {
-                        var char_pressed = event.key;
-                        console.log("KEY CODE --" + char_pressed);
-                        if (dbs.charcodeIsLetter(char_pressed) && 
-                        	undefined != char_pressed && 
-                        	233 != char_pressed &&
-                        	225 != char_pressed &&
-                        	32 != char_pressed) // Alt and Shift and Space keys should not trigger search.
-                        {
-                            // check if key is a letter or number
-                            searchBox.visible = true;
-                            searchTextField.requestFocus();
-                            searchTextField.setText(dbs.charcodeToQString(char_pressed));
-                        }
-                    }
-                    else {
-                        var char_pressed = event.key;
-                        if (8 == char_pressed) // Backspace hit when search is visible and empty closes search
-                        {
-                            if ("" == searchTextField.text || undefined == searchTextField.text) {
-                                searchBox.visible = false;
-                                dbs.populateGroupDataModel();
-                                searchTextField.setText(undefined);
-                                listView.requestFocus();
-                            }
-                        }
-                    }
-                }
-            }
-        ]
     } // end of Page
     attachedObjects: [
         ComponentDefinition {
@@ -279,36 +245,7 @@ NavigationPane {
             content: Page {
                 id: openDbPage
                 titleBar: TitleBar {
-                    kind: TitleBarKind.FreeForm
-                    kindProperties: FreeFormTitleBarKindProperties {
-                        content: Container {
-                            layout: StackLayout {
-                                orientation: LayoutOrientation.LeftToRight
-
-                            }
-                            verticalAlignment: VerticalAlignment.Center
-                            horizontalAlignment: HorizontalAlignment.Left
-                            bottomMargin: 40.0
-                            topMargin: 40.0
-                            leftMargin: 40.0
-                            rightMargin: 40.0
-                            ImageView {
-                                imageSource: "asset:///images/icon.png"
-                                verticalAlignment: VerticalAlignment.Center
-                                horizontalAlignment: HorizontalAlignment.Left
-                                scaleX: 0.6
-                                scaleY: 0.7
-                            }
-                            Label {
-                                text: qsTr("KeePass for BlackBerry")
-                                textStyle.fontSize: FontSize.Large
-                                textStyle.fontWeight: FontWeight.W400
-                                verticalAlignment: VerticalAlignment.Center
-                                horizontalAlignment: HorizontalAlignment.Left
-
-                            }
-                        }
-                    }
+                    title: qsTr("KeePass for BlackBerry")
                 }
                 content: Container {
                     layout: DockLayout {
@@ -392,22 +329,10 @@ NavigationPane {
                             textFormat: TextFormat.Plain
                             inputMode: TextFieldInputMode.Password
                             hintText: qsTr("Password")
-                            shortcuts: Shortcut {
-                                key: qsTr("Enter")
-                                onTriggered: {
-                                    kdbOpenButton.clicked();
-                                }
-                            }
                         }
                         Button { // OPEN DATABASE BUTTON
                             id: kdbOpenButton
                             focusPolicy: FocusPolicy.KeyAndTouch
-                            shortcuts: Shortcut {
-                                key: qsTr("Enter")
-                                onTriggered: {
-                                    kdbOpenButton.clicked();
-                                }
-                            }
                             verticalAlignment: VerticalAlignment.Center
                             text: qsTr("Open")
                             onClicked: {
@@ -517,37 +442,7 @@ NavigationPane {
             id: settingsSheet
             content: Page {
                 titleBar: TitleBar {
-                    kind: TitleBarKind.FreeForm
-                    kindProperties: FreeFormTitleBarKindProperties {
-                        content: Container {
-                            layout: DockLayout {
-
-                            }
-                            leftPadding: 15.0
-                            rightPadding: 10.0
-                            topPadding: 10.0
-                            bottomPadding: 10.0
-                            Label {
-                                text: qsTr("Settings")
-                                textFormat: TextFormat.Auto
-                                verticalAlignment: VerticalAlignment.Center
-                                textStyle.fontSize: FontSize.Large
-                                textStyle.fontWeight: FontWeight.W400
-                            }
-                            Button {
-                        	    text: qsTr("Done")
-                        	    onClicked: {
-                                    settingsSheet.close(); 
-                                    if (searchBox.visible)
-                                    {
-                                        searchTextField.requestFocus();
-                                    }
-                                }
-                                horizontalAlignment: HorizontalAlignment.Right
-                                verticalAlignment: VerticalAlignment.Center
-                            }
-                        }
-                    }    
+                	title: qsTr("Settings")
                 }
                 
                 Container {
@@ -561,6 +456,18 @@ NavigationPane {
                         onSelectedValueChanged: {
                             dbs.saveDatabaseSettingFor("lockoutTimerSetting", lockoutTimerSetting.selectedIndex)
                         }
+                    }
+
+                    Button {
+                        text: qsTr("Done")
+                        onClicked: {
+                            settingsSheet.close();
+                            if (searchBox.visible) {
+                                searchTextField.requestFocus();
+                            }
+                        }
+                        horizontalAlignment: HorizontalAlignment.Right
+                        verticalAlignment: VerticalAlignment.Center
                     }
                 }
                 //
