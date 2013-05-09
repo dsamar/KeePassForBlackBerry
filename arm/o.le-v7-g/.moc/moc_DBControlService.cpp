@@ -22,8 +22,8 @@ static const uint qt_meta_data_DBControlService[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      12,   14, // methods
-       2,   74, // properties
+      19,   14, // methods
+       2,  109, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
@@ -38,18 +38,25 @@ static const uint qt_meta_data_DBControlService[] = {
       74,   17,   17,   17, 0x0a,
       89,   17,   17,   17, 0x0a,
      107,   17,   17,   17, 0x0a,
+     136,  127,   17,   17, 0x0a,
+     192,   17,   17,   17, 0x0a,
+     205,   17,   17,   17, 0x0a,
 
  // methods: signature, parameters, type, tag, flags
-     121,   17,   17,   17, 0x02,
-     170,  135,   17,   17, 0x02,
-     207,   17,   17,   17, 0x02,
-     245,  232,   17,   17, 0x02,
-     297,  273,  265,   17, 0x02,
-     348,  326,   17,   17, 0x02,
+     220,   17,   17,   17, 0x02,
+     269,  234,   17,   17, 0x02,
+     306,   17,   17,   17, 0x02,
+     344,  331,   17,   17, 0x02,
+     371,  369,  364,   17, 0x02,
+     401,  369,  393,   17, 0x02,
+     448,  424,  393,   17, 0x02,
+     485,  424,  393,   17, 0x02,
+     546,  524,   17,   17, 0x02,
+     584,  524,   17,   17, 0x02,
 
  // properties: name, type, flags
-     378,  265, 0x0a495103,
-     389,  384, 0x01495003,
+     624,  393, 0x0a495103,
+     630,  364, 0x01495003,
 
  // properties: notify_signal_id
        0,
@@ -62,16 +69,21 @@ static const char qt_meta_stringdata_DBControlService[] = {
     "DBControlService\0\0valueChanged(QString)\0"
     "lockChanged(bool)\0b\0setLock(bool)\0"
     "setLockTimer()\0cancelLockTimer()\0"
-    "onThumbnail()\0unlockTrial()\0"
+    "startLockoutTimer()\0newState\0"
+    "onLockStateChanged(bb::platform::DeviceLockState::Type)\0"
+    "onMinimize()\0onFullScreen()\0unlockTrial()\0"
     "filePath,password,keyFile,readOnly\0"
     "unlock(QString,QString,QString,bool)\0"
     "populateGroupDataModel()\0searchString\0"
-    "searchText(QString)\0QString\0"
-    "objectName,defaultValue\0"
-    "getValueFor(QString,QString)\0"
+    "searchText(QString)\0bool\0u\0"
+    "charcodeIsLetter(int)\0QString\0"
+    "charcodeToQString(int)\0objectName,defaultValue\0"
+    "getGlobalSettingFor(QString,QString)\0"
+    "getDatabaseSettingFor(QString,QString)\0"
     "objectName,inputValue\0"
-    "saveValueFor(QString,QString)\0value\0"
-    "bool\0isLocked\0"
+    "saveGlobalSettingFor(QString,QString)\0"
+    "saveDatabaseSettingFor(QString,QString)\0"
+    "value\0isLocked\0"
 };
 
 void DBControlService::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -85,14 +97,24 @@ void DBControlService::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
         case 2: _t->setLock((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 3: _t->setLockTimer(); break;
         case 4: _t->cancelLockTimer(); break;
-        case 5: _t->onThumbnail(); break;
-        case 6: _t->unlockTrial(); break;
-        case 7: _t->unlock((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])),(*reinterpret_cast< bool(*)>(_a[4]))); break;
-        case 8: _t->populateGroupDataModel(); break;
-        case 9: _t->searchText((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 10: { QString _r = _t->getValueFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+        case 5: _t->startLockoutTimer(); break;
+        case 6: _t->onLockStateChanged((*reinterpret_cast< bb::platform::DeviceLockState::Type(*)>(_a[1]))); break;
+        case 7: _t->onMinimize(); break;
+        case 8: _t->onFullScreen(); break;
+        case 9: _t->unlockTrial(); break;
+        case 10: _t->unlock((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3])),(*reinterpret_cast< bool(*)>(_a[4]))); break;
+        case 11: _t->populateGroupDataModel(); break;
+        case 12: _t->searchText((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 13: { bool _r = _t->charcodeIsLetter((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
+        case 14: { QString _r = _t->charcodeToQString((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = _r; }  break;
-        case 11: _t->saveValueFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
+        case 15: { QString _r = _t->getGlobalSettingFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = _r; }  break;
+        case 16: { QString _r = _t->getDatabaseSettingFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = _r; }  break;
+        case 17: _t->saveGlobalSettingFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
+        case 18: _t->saveDatabaseSettingFor((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
         default: ;
         }
     }
@@ -130,9 +152,9 @@ int DBControlService::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 12)
+        if (_id < 19)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 12;
+        _id -= 19;
     }
 #ifndef QT_NO_PROPERTIES
       else if (_c == QMetaObject::ReadProperty) {
