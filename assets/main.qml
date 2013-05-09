@@ -172,10 +172,11 @@ NavigationPane {
 
                 onTriggered: {
                     // Update the data that will be shown in the password Page.
-                    passwordListPage.selectedData = dataModel.data(indexPath);
-                    passwordListPage.showPasswordPage();
+                    if (indexPath.length != 1) {
+                        passwordListPage.selectedData = dataModel.data(indexPath);
+                        passwordListPage.showPasswordPage();
+                    }
                 }
-
                 // Override the itemType() function to return the proper type
                 // for each item in the list. Because a GroupDataModel has only
                 // two levels, use the index path to determine whether the item
