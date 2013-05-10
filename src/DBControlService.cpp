@@ -14,6 +14,7 @@
    limitations under the License.
 ***************************************************************************/
 #include <QTimer>
+#include <QFile>
 #include <QChar>
 #include <QObject>
 #include "DBControlService.h"
@@ -106,7 +107,7 @@ void DBControlService::unlockTrial()
 void DBControlService::unlock(
 		QString filePath,
 		QString password,
-		QString keyfile,
+		QString keyFile,
 		bool readOnly)
 {
 	if (filePath != QString("app/native/assets/testdb.kdb"))
@@ -114,8 +115,14 @@ void DBControlService::unlock(
 		filePath = QDir::currentPath() + "/../../" + filePath;
 	}
 
-	if (!keyfile.isNull() && !keyfile.isEmpty()) {
-		keyfile = QDir::currentPath() + "/../../" + keyfile;
+	if (!keyFile.isNull() && !keyFile.isEmpty() && keyFile != "default") {
+		keyFile = QDir::currentPath() + "/../../" + keyFile;
+	}
+
+	// Check if key-file exists, if it does not, try loading database anyway.
+	if ( !QFile(keyFile).exists() )
+	{
+		keyFile = QString::null;
 	}
 
 	if (!this->mIsLocked)
@@ -131,6 +138,13 @@ void DBControlService::unlock(
 		return;
 	}
 
+	// Check if database file exists.
+	if ( !QFile(filePath).exists() )
+	{
+		this->setValue("Database does not exist.");
+		return;
+	}
+
 	this->db = new Kdb3Database();
 	if (0 == this->db)
 	{
@@ -138,7 +152,7 @@ void DBControlService::unlock(
 		return;
 	}
 
-	if ( !db->setKey(password, keyfile) )
+	if ( !db->setKey(password, keyFile) )
 	{
 		this->setValue(db->getError());
 		return;
